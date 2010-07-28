@@ -1,0 +1,10 @@
+<html>
+  <body>
+    <%= get('_/shared/header') %>
+    <% @posts.each do |post| %>
+      <div>
+        <%= post.title %>
+      </div>
+    <% end %>
+  </body>
+</html>
