@@ -2,16 +2,24 @@ module Dylan::Base
 
   def self.included(base)
     base.class_eval do
-      extend Dylan::Actions
+      extend  Dylan::Actions
       include Dylan::Helpers
       include Dylan::Rendering
       include Tilt::CompileSite
     end
   end
 
-  def initialize(*)
+  def initialize(*args)
     router = self.class.router.clone
     router.routes.each { |route| route.compile }
+
+    if args.first.respond_to?(:call)
+      router.default args.shift
+    end
+
+    if Hash === args.first
+      @_options = args.shift
+    end
 
     @_stack = Rack::Builder.app do
       use Dylan::Middleware::BrowserCache
@@ -26,7 +34,11 @@ module Dylan::Base
   end
 
   def call(env)
-    dup._call(env)
+    if env['PATH_INFO'] =~ /^\/?_/ and not env['dylan.internal']
+      [403, {'Content-Type' => 'text/plain'}, ['Access denyed']]
+    else
+      dup._call(env)
+    end
   end
 
   def _call(env)

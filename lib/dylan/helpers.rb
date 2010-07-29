@@ -21,8 +21,20 @@ module Dylan::Helpers
   end
 
   def get(url)
-    env = self.env.dup
-    env['PATH_INFO'] = url
+    fetch(:get, url)
+  end
+
+  def fetch(method, url)
+    env      = self.env.dup
+    req      = Rack::Request.new(env)
+    base_url = URI.parse(req.url)
+    url      = base_url.merge(url)
+
+    env['HTTP_HOST']      = "#{url.host}:#{url.port}"
+    env['REQUEST_METHOD'] = method.to_s.upcase
+    env['REQUEST_PATH']   = url.path if env['REQUEST_PATH']
+    env['PATH_INFO']      = url.path.sub(/^#{Regexp.escape(env['SCRIPT_NAME'])}/, '')
+    env['QUERY_STRING']   = url.query
     env['dylan.internal'] = true
 
     if @_rendering
@@ -32,6 +44,7 @@ module Dylan::Helpers
         body.each { |chunk| content << chunk }
         content
       else
+        puts [status, headers, body]
         nil
       end
     else
