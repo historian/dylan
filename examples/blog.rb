@@ -1,4 +1,4 @@
-class Blog < Leonard
+class Blog < Dylan
 
   get '/' do
     get '/page/0'
@@ -20,7 +20,8 @@ class Blog < Leonard
     render 'tags'
   end
 
-  class Shared < Leonard
+  class Shared < Dylan
+    private
 
     get '/header' do
       render 'header.erb'
@@ -28,7 +29,8 @@ class Blog < Leonard
 
   end
 
-  class Comments < Leonard
+  class Comments < Dylan
+    private
 
     get '/post/:id' do
       @comments = Comment.where(:post_id => params[:id]).all

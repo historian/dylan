@@ -1,4 +1,4 @@
-module Leonard::Rendering
+module Dylan::Rendering
 
   def each(&block)
     @_rendering = true

@@ -1,4 +1,4 @@
-module Leonard::Helpers
+module Dylan::Helpers
 
   def env
     @_env
@@ -23,6 +23,7 @@ module Leonard::Helpers
   def get(url)
     env = self.env.dup
     env['PATH_INFO'] = url
+    env['dylan.internal'] = true
 
     if @_rendering
       status, headers, body = call(env)

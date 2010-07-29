@@ -1,4 +1,4 @@
-module Leonard::Actions
+module Dylan::Actions
 
   def router
     @router ||= (superclass.router.clone rescue HttpRouter.new)
@@ -30,12 +30,16 @@ module Leonard::Actions
     if block
       method = path.to_s
       define_method(method, &block)
-      route = route.to do |env|
-        env['leonard'].__call(env, method)
-      end
+
+      route.to(Rack::Builder.app do
+        use Dylan::Middleware::ETag
+        run Dylan::Middleware::Action.new(method)
+      end)
+
       route.instance_variable_set('@paths', nil)
     end
 
     route
   end
+
 end
