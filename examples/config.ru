@@ -1,5 +1,8 @@
 # vim: set ft=ruby:
-$:.unshift File.expand_path('../../lib', __FILE__)
+
+require "rubygems"
+require "bundler/setup"
+
 require 'dylan'
 require 'models'
 require 'albums/comments'

@@ -5,6 +5,7 @@ class Dylan
   require 'http_router'
   require 'digest/sha1'
 
+  require 'dylan/version'
   require 'dylan/base'
   require 'dylan/actions'
   require 'dylan/rendering'
