@@ -32,6 +32,4 @@ class Blog < Dylan
   add('_/shared/*').to(Shared.new)
   add('_/comments/*').to(Comments.new)
 
-  add('assets/*').host(/^assets\./).to(Assets.new)
-
 end

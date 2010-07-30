@@ -10,7 +10,7 @@ module Dylan::Base
   end
 
   def initialize(*args)
-    @_router = HttpRouter.new
+    @_router = _router = HttpRouter.new
     self.class.routes.each { |route| route.bind(self) }
 
     if args.first.respond_to?(:call)
@@ -23,7 +23,7 @@ module Dylan::Base
 
     @_stack = Rack::Builder.app do
       use Dylan::Middleware::BrowserCache
-      run @_router
+      run _router
     end
 
     @_templates = {}

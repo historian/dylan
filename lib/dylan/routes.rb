@@ -117,10 +117,10 @@ module Dylan::Routes
     end
 
     def bind(instance)
-      if @action
+      if _action = @action
         action = Rack::Builder.app do
           use Dylan::Middleware::ETag
-          run Dylan::Middleware::Action.new(@action)
+          run Dylan::Middleware::Action.new(_action)
         end
 
         record(:to, [action], nil, nil)
@@ -128,8 +128,10 @@ module Dylan::Routes
         @action = nil
       end
 
+      router = instance.instance_variable_get('@_router')
+
       method, args, block = *@initial_call
-      route = instance.router.__send__(method, *args, &block)
+      route = router.__send__(method, *args, &block)
 
       @calls.each do |(method, args, block)|
         route = route.__send__(method, *args, &block)
