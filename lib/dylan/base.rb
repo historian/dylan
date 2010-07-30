@@ -2,7 +2,7 @@ module Dylan::Base
 
   def self.included(base)
     base.class_eval do
-      extend  Dylan::Actions
+      extend  Dylan::Routes
       include Dylan::Helpers
       include Dylan::Rendering
       include Tilt::CompileSite
@@ -10,11 +10,11 @@ module Dylan::Base
   end
 
   def initialize(*args)
-    router = self.class.router.clone
-    router.routes.each { |route| route.compile }
+    @_router = HttpRouter.new
+    self.class.routes.each { |route| route.bind(self) }
 
     if args.first.respond_to?(:call)
-      router.default args.shift
+      @_router.default args.shift
     end
 
     if Hash === args.first
@@ -23,7 +23,7 @@ module Dylan::Base
 
     @_stack = Rack::Builder.app do
       use Dylan::Middleware::BrowserCache
-      run router
+      run @_router
     end
 
     @_templates = {}

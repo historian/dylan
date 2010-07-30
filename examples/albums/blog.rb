@@ -1,13 +1,13 @@
 class Blog < Dylan
 
   # public action
-  get '/' do
+  get('/').name(:index) do
     # forward this request to a different resource (without redirecting)
-    get '/page/0'
+    get url(:page, :page => 0)
   end
 
   # public action with parameter
-  get '/page/:page' do
+  get('/page/:page').name(:page) do
     @posts = Post.all
     halt 404 if @posts.empty?
     render 'templates/page.erb'
@@ -31,5 +31,7 @@ class Blog < Dylan
   # private sub albums
   add('_/shared/*').to(Shared.new)
   add('_/comments/*').to(Comments.new)
+
+  add('assets/*').host(/^assets\./).to(Assets.new)
 
 end

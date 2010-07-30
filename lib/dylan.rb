@@ -7,7 +7,7 @@ class Dylan
 
   require 'dylan/version'
   require 'dylan/base'
-  require 'dylan/actions'
+  require 'dylan/routes'
   require 'dylan/rendering'
   require 'dylan/helpers'
 

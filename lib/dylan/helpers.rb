@@ -8,6 +8,10 @@ module Dylan::Helpers
     env['router.params']
   end
 
+  def url(route, *args)
+    @_router.url(route, *args)
+  end
+
   def headers
     @_headers ||= { 'Content-Type' => 'text/html' }
   end
