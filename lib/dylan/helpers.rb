@@ -9,7 +9,7 @@ module Dylan::Helpers
   end
 
   def url(route, *args)
-    @_router.url(route, *args)
+    self.router.url(route, *args)
   end
 
   def headers
@@ -18,8 +18,8 @@ module Dylan::Helpers
 
   def halt(status, headers=nil, body=nil)
     @_status  = status.to_i
-    @_headers = headers if headers
-    @_body    = body || []
+    @_headers = headers || { 'Content-Type' => 'text/html' }
+    @_body    = body    || []
 
     throw(:halt)
   end
@@ -42,7 +42,7 @@ module Dylan::Helpers
     env['dylan.internal'] = true
 
     if @_rendering
-      status, headers, body = call(env)
+      status, headers, body = @_prototype.call(env)
       if status == 200
         content = ""
         body.each { |chunk| content << chunk }
@@ -52,7 +52,7 @@ module Dylan::Helpers
         nil
       end
     else
-      halt *call(env)
+      halt *@_prototype.call(env)
     end
   end
 

@@ -7,12 +7,15 @@ class Dylan
 
   require 'dylan/version'
   require 'dylan/base'
+  require 'dylan/configuration'
   require 'dylan/routes'
+  require 'dylan/templates'
   require 'dylan/rendering'
   require 'dylan/helpers'
 
   module Middleware
     require 'dylan/middleware/action'
+    require 'dylan/middleware/default'
     require 'dylan/middleware/browser_cache'
     require 'dylan/middleware/etag'
   end

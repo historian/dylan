@@ -3,33 +3,21 @@ module Dylan::Base
   def self.included(base)
     base.class_eval do
       extend  Dylan::Routes
+      extend  Dylan::Configuration
       include Dylan::Helpers
+      include Dylan::Templates
       include Dylan::Rendering
       include Tilt::CompileSite
     end
   end
 
   def initialize(*args)
-    @_router = _router = HttpRouter.new
-    self.class.routes.each { |route| route.bind(self) }
-
     if args.first.respond_to?(:call)
-      @_router.default args.shift
+      @_default = args.shift
     end
 
-    if Hash === args.first
-      @_options = args.shift
-    end
-
-    @_stack = Rack::Builder.app do
-      use Dylan::Middleware::BrowserCache
-      run _router
-    end
-
-    @_templates = {}
-
-    @_template = @_status = @_headers = \
-      @_body = @_rendering = @_env = \
+    @_template = @_status    = @_headers = \
+    @_body     = @_rendering = @_env     = \
       nil
   end
 
@@ -37,21 +25,20 @@ module Dylan::Base
     if env['PATH_INFO'] =~ /^\/?_/ and not env['dylan.internal']
       [403, {'Content-Type' => 'text/plain'}, ['Access denyed']]
     else
-      dup._call(env)
+      dup._call(self, env)
     end
   end
 
-  def _call(env)
+  def _call(prototype, env)
+    env['dylan.prototype'] = prototype
     env['dylan'] = self
-    @_stack.call(env)
+    @_prototype = prototype
+    
+    self.class.stack.call(env)
   end
 
   def response
-    [@_status, self.headers, @_body]
-  end
-
-  def template(path)
-    @_templates[path] ||= Tilt.new(path)
+    [@_status, @_headers, @_body]
   end
 
 end

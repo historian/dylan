@@ -29,6 +29,21 @@ module Dylan::Routes
     self.routes << route
     route
   end
+  
+  def stack(reload=false)
+    @stack = nil if reload
+    
+    @stack ||= begin
+      _router = HttpRouter.new
+      @routes.each { |route| route.bind(_router) }
+      _router.default = Dylan::Middleware::Default
+      
+      Rack::Builder.app do
+        use Dylan::Middleware::BrowserCache
+        run _router
+      end
+    end
+  end
 
   class Route
 
@@ -116,7 +131,7 @@ module Dylan::Routes
       record :static, [root], nil, nil
     end
 
-    def bind(instance)
+    def bind(router)
       if _action = @action
         action = Rack::Builder.app do
           use Dylan::Middleware::ETag
@@ -127,8 +142,6 @@ module Dylan::Routes
 
         @action = nil
       end
-
-      router = instance.instance_variable_get('@_router')
 
       method, args, block = *@initial_call
       route = router.__send__(method, *args, &block)
